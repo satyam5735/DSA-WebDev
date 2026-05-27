@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ditto Dojo: Transform & Slice</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #2c3e50;
+            font-family: 'Fredoka One', cursive;
+            touch-action: none; /* Prevent scroll on mobile */
+            user-select: none;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #4a3b52 0%, #1a1a2e 100%);
+            overflow: hidden;
+        }
+
+        /* Background Dojo Pattern */
+        .bg-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            background-image: linear-gradient(45deg, #ffffff 25%, transparent 25%),
+            linear-gradient(-45deg, #ffffff 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #ffffff 75%),
+            linear-gradient(-45deg, transparent 75%, #ffffff 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+            pointer-events: none;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: none; /* Hide default cursor */
+        }
+
+        /* UI Overlay */
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .score-box {
+            color: #FFD700;
+            font-size: 48px;
+            text-shadow: 3px 3px 0px #333, 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .label {
+            font-size: 16px;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: -5px;
+        }
+
+        .lives-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .life-icon {
+            width: 40px;
+            height: 40px;
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.5));
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .life-lost {
+            opacity: 0.3;
+            transform: scale(0.8);
+            filter: grayscale(100%);
+        }
+
+        /* Menu Screens */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            transition: opacity 0.3s;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            display: none;
+        }
+
+        h1 {
+            font-size: 72px;
+            color: #ff6b81;
+            margin: 0 0 20px 0;
+            text-shadow: 4px 4px 0px #5a1e2d;
+            text-align: center;
+            line-height: 1;
+        }
+
+        h1 span {
+            display: block;
+            font-size: 32px;
+            color: #fff;
+            text-shadow: none;
+            margin-top: 10px;
+        }
+
+        .btn {
+            background: linear-gradient(to bottom, #ff6b81, #c44569);
+            border: none;
+            padding: 15px 40px;
+            font-size: 32px;
+            color: white;
+            font-family: 'Fredoka One', cursive;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 0 #8a2b45, 0 15px 20px rgba(0,0,0,0.4);
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-transform: uppercase;
+        }
+
+        .btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 5px 0 #8a2b45, 0 5px 10px rgba(0,0,0,0.4);
+        }
+
+        .tutorial {
+            margin-top: 30px;
+            color: #ddd;
+            font-size: 18px;
+            text-align: center;
+            line-height: 1.5;
+            max-width: 400px;
+        }
+
+        .tutorial b {
+            color: #ff6b81;
+        }
+
+        /* SVG Icons Definitions (Hidden) */
+        #svg-assets {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="bg-pattern"></div>
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- UI Layer -->
+    <div id="ui-layer">
+        <div class="hud-top">
+            <div>
+                <div class="label">Score</div>
+                <div class="score-box" id="scoreDisplay">0</div>
+            </div>
+            <div class="lives-box" id="livesDisplay">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="startScreen" class="screen">
+        <h1>DITTO DOJO<span>The Transformation Ninja</span></h1>
+        <button class="btn" id="startBtn">New Game</button>
+        <div class="tutorial">
+            Slice the <b>Dittos</b> & Fruits!<br>
+            Avoid the <b>Bombs</b> (Voltorbs).<br>
+            Don't let Dittos fall unsliced!
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="screen hidden">
+        <h1 style="color: #fff; font-size: 50px;">Game Over</h1>
+        <div class="label">Final Score</div>
+        <div class="score-box" id="finalScore" style="margin-bottom: 30px; font-size: 64px;">0</div>
+        <div class="label" style="margin-bottom: 10px;">High Score: <span id="bestScore">0</span></div>
+        <button class="btn" id="restartBtn">Try Again</button>
+    </div>
+</div>
+
+<!-- Hidden SVG assets to draw to canvas -->
+<div style="display:none;">
+    <img id="pokeball-img" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23f0f0f0' stroke='%23333' stroke-width='5'/><path d='M 5,50 A 45,45 0 0,1 95,50' fill='%23ff5252' /><rect x='5' y='45' width='90' height='10' fill='%23333' /><circle cx='50' cy='50' r='12' fill='%23fff' stroke='%23333' stroke-width='5' /></svg>">
+</div>
+
+<script>
+    /**
+     * DITTO DOJO - Game Logic
+     * Built with vanilla JS and Canvas
+     */
+
+        // --- Configuration ---
+    const CONFIG = {
+            gravity: 0.25,
+            minVelocityY: 12,
+            maxVelocityY: 17,
+            minVelocityX: -4,
+            maxVelocityX: 4,
+            spawnRate: 1000, // Initial ms between spawns
+            minSpawnRate: 400, // Fastest spawn rate
+            bladeLifetime: 150, // ms
+            bladeWidth: 8,
+            comboWindow: 150, // ms to chain hits
+        };
+
+    // --- Audio System (Synthesizer) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    const Sound = {
+        playTone: (freq, type, duration) => {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        },
+        playSlice: () => {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        },
+        playCombo: () => {
+            Sound.playTone(600, 'sine', 0.1);
+            setTimeout(() => Sound.playTone(800, 'sine', 0.1), 50);
+            setTimeout(() => Sound.playTone(1200, 'square', 0.2), 100);
+        },
+        playBomb: () => {
+            Sound.playTone(100, 'sawtooth', 0.8);
+            Sound.playTone(50, 'square', 0.8);
+        },
+        playSplat: () => {
+            Sound.playTone(200, 'triangle', 0.1);
+        }
+    };
+
+    // --- Game State ---
+    const state = {
+        screen: 'start', // start, game, gameover
+        score: 0,
+        lives: 3,
+        entities: [],
+        particles: [],
+        blade: [],
+        lastTime: 0,
+        spawnTimer: 0,
+        currentSpawnRate: CONFIG.spawnRate,
+        comboCount: 0,
+        lastSliceTime: 0,
+        highScore: parseInt(localStorage.getItem('dittoDojoHighScore')) || 0
+    };
+
+    // --- Assets & Entities ---
+    // Using Emojis as "Textures" for performance and ease
+    const TYPES = {
+        DITTO: { type: 'ditto', icon: '😐', color: '#cf86a7', score: 10, splatColor: '#cf86a7' }, // Generic Ditto
+        TRANSFORMED: [
+            { type: 'fruit', icon: '🍉', color: '#e74c3c', score: 20, splatColor: '#e74c3c' },
+            { type: 'fruit', icon: '🍊', color: '#e67e22', score: 20, splatColor: '#f39c12' },
+            { type: 'fruit', icon: '🥝', color: '#8e44ad', score: 20, splatColor: '#27ae60' },
+            { type: 'fruit', icon: '🍍', color: '#f1c40f', score: 20, splatColor: '#f1c40f' },
+            { type: 'fruit', icon: '🍎', color: '#c0392b', score: 20, splatColor: '#ecf0f1' }
+        ],
+        SHINY: { type: 'shiny', icon: '💠', color: '#3498db', score: 50, splatColor: '#3498db' },
+        BOMB: { type: 'bomb', icon: '💣', color: '#2c3e50', score: 0, splatColor: '#000' }
+    };
+
+    // Canvas Setup
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width * window.devicePixelRatio;
+        canvas.height = height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // --- Classes ---
+
+    class Entity {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            // Random velocity to throw upwards and slightly sideways
+            this.vx = (Math.random() * (CONFIG.maxVelocityX - CONFIG.minVelocityX) + CONFIG.minVelocityX);
+            // Throw towards center bias
+            if (x < width / 2) this.vx = Math.abs(this.vx);
+            else this.vx = -Math.abs(this.vx);
+
+            this.vy = -(Math.random() * (CONFIG.maxVelocityY - CONFIG.minVelocityY) + CONFIG.minVelocityY);
+
+            this.rotation = 0;
+            this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+            this.radius = 35;
+            this.active = true;
+            this.sliced = false;
+
+            // Determine Type
+            const rand = Math.random();
+            if (rand < 0.15) {
+                this.data = TYPES.BOMB;
+            } else if (rand < 0.2) {
+                this.data = TYPES.SHINY;
+            } else if (rand < 0.6) {
+                // Transformed Ditto (Fruit)
+                this.data = TYPES.TRANSFORMED[Math.floor(Math.random() * TYPES.TRANSFORMED.length)];
+            } else {
+                // Normal Ditto
+                this.data = TYPES.DITTO;
+            }
+        }
+
+        update() {
+            if (!this.active) return;
+
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vy += CONFIG.gravity;
+            this.rotation += this.rotationSpeed;
+
+            // Remove if fell off screen
+            if (this.y > height + 100) {
+                this.active = false;
+                if (!this.sliced && this.data.type !== 'bomb') {
+                    looseLife();
+                }
+            }
+        }
+
+        draw() {
+            if (!this.active || this.sliced) return;
+
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+
+            // Draw Shadow
+            ctx.font = "60px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            // If it's a Ditto, maybe transform visuals a bit?
+            // For now, just the emoji
+            ctx.fillText(this.data.icon, 0, 5);
+
+            // Debug hit circle
+            // ctx.beginPath(); ctx.arc(0,0,this.radius, 0, Math.PI*2); ctx.stroke();
+
+            ctx.restore();
+        }
+    }
+
+    class Particle {
+        constructor(x, y, color, type = 'splat') {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.type = type; // 'splat' or 'slice'
+            this.vx = (Math.random() - 0.5) * 10;
+            this.vy = (Math.random() - 0.5) * 10;
+            this.life = 1.0;
+            this.decay = Math.random() * 0.03 + 0.01;
+            this.size = Math.random() * 5 + 2;
+            if (type === 'slice') {
+                this.size = 20;
+                this.vx *= 0.5;
+                this.vy *= 0.5;
+            }
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vy += 0.1; // gravity for particles
+            this.life -= this.decay;
+        }
+
+        draw() {
+            ctx.globalAlpha = this.life;
+            ctx.fillStyle = this.color;
+
+            if (this.type === 'slice') {
+                // Draw half fruit fading away
+                ctx.font = "40px Arial";
+                ctx.fillText(this.color, this.x, this.y); // Hack: passing emoji as color for slices
+            } else {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1.0;
+        }
+    }
+
+    class FloatingText {
+        constructor(x, y, text, color) {
+            this.x = x;
+            this.y = y;
+            this.text = text;
+            this.color = color;
+            this.vy = -2;
+            this.life = 1.0;
+        }
+        update() {
+            this.y += this.vy;
+            this.life -= 0.02;
+        }
+        draw() {
+            if(this.life <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = this.life;
+            ctx.fillStyle = this.color;
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.font = "bold 30px 'Fredoka One'";
+            ctx.strokeText(this.text, this.x, this.y);
+            ctx.fillText(this.text, this.x, this.y);
+            ctx.restore();
+        }
+    }
+
+    // --- Input Handling ---
+    const input = { x: 0, y: 0, isDown: false, points: [] };
+
+    function handleStart(e) {
+        e.preventDefault(); // important for mobile
+        input.isDown = true;
+        updateInputPos(e);
+    }
+
+    function handleMove(e) {
+        e.preventDefault();
+        if (input.isDown) {
+            updateInputPos(e);
+            // Add point to blade with TIMESTAMP to prevent immediate deletion
+            input.points.push({
+                x: input.x,
+                y: input.y,
+                life: CONFIG.bladeLifetime,
+                timestamp: Date.now()
+            });
+        }
+    }
+
+    function handleEnd(e) {
+        e.preventDefault();
+        input.isDown = false;
+        input.points = []; // Clear blade on lift (optional, Fruit Ninja usually trails off)
+        state.comboCount = 0; // Reset combo on lift
+    }
+
+    function updateInputPos(e) {
+        if (e.touches) {
+            input.x = e.touches[0].clientX;
+            input.y = e.touches[0].clientY;
+        } else {
+            input.x = e.clientX;
+            input.y = e.clientY;
+        }
+    }
+
+    canvas.addEventListener('mousedown', handleStart);
+    canvas.addEventListener('mousemove', handleMove);
+    window.addEventListener('mouseup', handleEnd);
+
+    canvas.addEventListener('touchstart', handleStart, {passive: false});
+    canvas.addEventListener('touchmove', handleMove, {passive: false});
+    canvas.addEventListener('touchend', handleEnd);
+
+    // --- Game Logic Functions ---
+
+    function spawnEntity() {
+        // X position random but within margin
+        const margin = 50;
+        const x = Math.random() * (width - margin * 2) + margin;
+        const y = height + 60;
+        state.entities.push(new Entity(x, y));
+    }
+
+    function checkCollisions() {
+        if (input.points.length < 2) return;
+
+        // Check ALL segments of the blade, not just the tip, for better accuracy on fast swipes
+        state.entities.forEach(entity => {
+            if (entity.active && !entity.sliced) {
+                for (let i = 0; i < input.points.length - 1; i++) {
+                    const p1 = input.points[i];
+                    const p2 = input.points[i+1];
+                    const dist = pointLineDistance(entity.x, entity.y, p1.x, p1.y, p2.x, p2.y);
+
+                    if (dist < entity.radius) {
+                        sliceEntity(entity);
+                        break; // Stop checking this entity once sliced
+                    }
+                }
+            }
+        });
+    }
+
+    function sliceEntity(entity) {
+        entity.sliced = true;
+        entity.active = false;
+
+        // Hit a bomb?
+        if (entity.data.type === 'bomb') {
+            Sound.playBomb();
+            gameOver();
+            return;
+        }
+
+        // Score Logic
+        Sound.playSplat();
+        Sound.playSlice();
+
+        // Combo Logic
+        const now = Date.now();
+        if (now - state.lastSliceTime < CONFIG.comboWindow) {
+            state.comboCount++;
+        } else {
+            state.comboCount = 1;
+        }
+        state.lastSliceTime = now;
+
+        let points = entity.data.score;
+
+        // Combo Bonus
+        if (state.comboCount >= 3) {
+            points *= state.comboCount;
+            state.particles.push(new FloatingText(entity.x, entity.y - 50, `${state.comboCount} COMBO!`, '#f1c40f'));
+            Sound.playCombo();
+        }
+
+        state.score += points;
+        updateScore();
+
+        // Create Visuals
+        // 1. Juice Splatters
+        for (let i = 0; i < 10; i++) {
+            state.particles.push(new Particle(entity.x, entity.y, entity.data.splatColor));
+        }
+        // 2. Split Halves (fake it with particles)
+        // Using the emoji as text particle
+        state.particles.push(new Particle(entity.x - 10, entity.y, entity.data.icon, 'slice'));
+        state.particles.push(new Particle(entity.x + 10, entity.y, entity.data.icon, 'slice'));
+
+        // 3. Floating Score
+        state.particles.push(new FloatingText(entity.x, entity.y, `+${points}`, '#fff'));
+    }
+
+    // Math helper for collision
+    function pointLineDistance(px, py, x1, y1, x2, y2) {
+        const A = px - x1;
+        const B = py - y1;
+        const C = x2 - x1;
+        const D = y2 - y1;
+
+        const dot = A * C + B * D;
+        const len_sq = C * C + D * D;
+        let param = -1;
+        if (len_sq !== 0) param = dot / len_sq;
+
+        let xx, yy;
+
+        if (param < 0) {
+            xx = x1; yy = y1;
+        } else if (param > 1) {
+            xx = x2; yy = y2;
+        } else {
+            xx = x1 + param * C;
+            yy = y1 + param * D;
+        }
+
+        const dx = px - xx;
+        const dy = py - yy;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function looseLife() {
+        state.lives--;
+        updateLives();
+        // Red flash
+        const flash = document.createElement('div');
+        flash.style.position = 'absolute';
+        flash.style.top = '0'; flash.style.left = '0';
+        flash.style.width = '100%'; flash.style.height = '100%';
+        flash.style.background = 'red';
+        flash.style.opacity = '0.3';
+        flash.style.pointerEvents = 'none';
+        document.body.appendChild(flash);
+        setTimeout(() => flash.remove(), 100);
+
+        Sound.playTone(100, 'sawtooth', 0.3);
+
+        if (state.lives <= 0) {
+            gameOver();
+        }
+    }
+
+    function updateScore() {
+        document.getElementById('scoreDisplay').innerText = state.score;
+    }
+
+    function updateLives() {
+        const container = document.getElementById('livesDisplay');
+        container.innerHTML = '';
+        const pokeballSrc = document.getElementById('pokeball-img').src;
+
+        for(let i=0; i<3; i++) {
+            const img = document.createElement('img');
+            img.src = pokeballSrc;
+            img.className = 'life-icon' + (i >= state.lives ? ' life-lost' : '');
+            container.appendChild(img);
+        }
+    }
+
+    // --- Main Loop ---
+
+    function gameLoop(timestamp) {
+        if (state.screen !== 'game') return;
+
+        const deltaTime = timestamp - state.lastTime;
+        state.lastTime = timestamp;
+
+        // Clear
+        ctx.clearRect(0, 0, width, height);
+
+        // Spawn
+        state.spawnTimer += deltaTime;
+        if (state.spawnTimer > state.currentSpawnRate) {
+            spawnEntity();
+            state.spawnTimer = 0;
+            // Difficulty Curve
+            if (state.currentSpawnRate > CONFIG.minSpawnRate) {
+                state.currentSpawnRate -= 2;
+            }
+        }
+
+        // Update & Draw Entities
+        // Filter out dead entities
+        state.entities = state.entities.filter(e => e.active || e.y < height + 200);
+        state.entities.forEach(e => {
+            e.update();
+            e.draw();
+        });
+
+        // Update & Draw Blade
+        // Remove old blade points
+        const now = Date.now();
+        input.points = input.points.filter(p => now - p.timestamp < CONFIG.bladeLifetime);
+
+        // Draw blade
+        if (input.points.length > 1) {
+            ctx.beginPath();
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            // Draw glow
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = '#00d2ff';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = CONFIG.bladeWidth;
+
+            ctx.moveTo(input.points[0].x, input.points[0].y);
+            for (let i = 1; i < input.points.length; i++) {
+                ctx.lineTo(input.points[i].x, input.points[i].y);
+            }
+            ctx.stroke();
+
+            // Reset shadow
+            ctx.shadowBlur = 0;
+        }
+
+        // Collisions
+        checkCollisions();
+
+        // Particles
+        state.particles = state.particles.filter(p => p.life > 0);
+        state.particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    // --- Game Flow ---
+
+    function initGame() {
+        state.screen = 'game';
+        state.score = 0;
+        state.lives = 3;
+        state.entities = [];
+        state.particles = [];
+        state.currentSpawnRate = CONFIG.spawnRate;
+        state.lastTime = performance.now();
+
+        updateScore();
+        updateLives();
+
+        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('gameOverScreen').classList.add('hidden');
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    function gameOver() {
+        state.screen = 'gameover';
+        if (state.score > state.highScore) {
+            state.highScore = state.score;
+            localStorage.setItem('dittoDojoHighScore', state.highScore);
+        }
+
+        document.getElementById('finalScore').innerText = state.score;
+        document.getElementById('bestScore').innerText = state.highScore;
+        document.getElementById('gameOverScreen').classList.remove('hidden');
+    }
+
+    // --- Event Listeners ---
+    document.getElementById('startBtn').addEventListener('click', () => {
+        // Init Audio Context on user gesture
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        initGame();
+    });
+
+    document.getElementById('restartBtn').addEventListener('click', () => {
+        initGame();
+    });
+
+    // Initialize UI
+    updateLives();
+
+</script>
+</body>
+</html>
