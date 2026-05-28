@@ -1,12 +1,6 @@
 package Revision_Daywise;
 
-import SigmaBatch.ClassProblems.FunctionsAndMethods.Factorial;
-
-import java.util.Scanner;
-
-import static java.lang.Math.pow;
-
-public class Day5 {
+public class DayFive {
 
     // RECURSION Part 1
 
@@ -117,5 +111,8 @@ public class Day5 {
     // Recursion Part 2
 
     //
+    public static void main(String[] args) {
+
+    }
 
 }
