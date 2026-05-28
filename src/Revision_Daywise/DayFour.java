@@ -129,12 +129,4 @@ public class DayFour {
 //        }
 //
 //    }
-
-
-
-     // RECURSION
-    public static void main(String[] args) {
-    int arr[] = {51,8,2,4,11,9,0};
-
-    }
 }
