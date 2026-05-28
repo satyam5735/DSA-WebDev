@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Timer | Ready</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@200;400;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.8s ease-in-out; }
+        .font-timer { font-family: 'Montserrat', sans-serif; }
+
+        /* Glassmorphism */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animations */
+        @keyframes breathe {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.02); filter: brightness(1.1); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        .animate-breathe { animation: breathe 6s ease-in-out infinite; }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s linear, stroke 0.8s ease;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        /* Micro-interactions */
+        .btn-press { transition: transform 0.1s ease; }
+        .btn-press:active { transform: scale(0.95); }
+
+        /* Input Styling for Duration Change */
+        input[type=number]::-webkit-inner-spin-button { opacity: 1; }
+    </style>
+</head>
+<body class="h-screen w-full flex items-center justify-center bg-slate-900 text-white overflow-hidden relative selection:bg-white selection:text-slate-900">
+
+<div id="bg-gradient" class="absolute inset-0 bg-gradient-to-br from-slate-800 to-black opacity-80 transition-all duration-1000"></div>
+<div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/noise.png')] pointer-events-none"></div>
+
+<main class="relative z-10 w-full max-w-md p-6">
+    <div class="glass rounded-3xl p-8 flex flex-col items-center gap-8 relative overflow-hidden">
+
+        <div class="flex bg-black/20 rounded-full p-1 gap-1 z-20">
+            <button onclick="timerApp.switchMode('focus')" id="btn-focus" class="mode-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 bg-white/20 shadow-md">Focus</button>
+            <button onclick="timerApp.switchMode('shortBreak')" id="btn-short" class="mode-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-white/60 hover:text-white">Short Break</button>
+            <button onclick="timerApp.switchMode('longBreak')" id="btn-long" class="mode-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-white/60 hover:text-white">Long Break</button>
+        </div>
+
+        <div class="relative w-64 h-64 flex items-center justify-center">
+            <svg class="absolute w-full h-full drop-shadow-2xl" width="256" height="256" viewBox="0 0 256 256">
+                <circle cx="128" cy="128" r="120" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="8"></circle>
+                <circle id="progress-ring" class="progress-ring__circle" cx="128" cy="128" r="120" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-dasharray="753.98" stroke-dashoffset="0"></circle>
+            </svg>
+            <div class="text-center z-10" id="timer-container">
+                <h1 id="time-display" class="font-timer text-6xl font-extralight tracking-wider text-white drop-shadow-lg cursor-pointer" onclick="timerApp.openSettings()" title="Click to Edit Time">25:00</h1>
+                <p id="status-text" class="text-xs uppercase tracking-[0.2em] text-white/50 mt-2 font-medium">Ready to Focus</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-6 z-20">
+            <button onclick="timerApp.toggleTimer()" id="main-action-btn" class="btn-press bg-white text-slate-900 w-16 h-16 rounded-full flex items-center justify-center text-xl shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)]">
+                <i id="action-icon" class="fas fa-play ml-1"></i>
+            </button>
+
+            <button onclick="timerApp.resetTimer()" class="btn-press bg-white/10 text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/20 backdrop-blur-sm" title="Reset Timer">
+                <i class="fas fa-rotate-right"></i>
+            </button>
+
+            <button onclick="timerApp.openSettings()" class="btn-press bg-white/10 text-white w-12 h-12 rounded-full flex items-center justify-center hover:bg-white/20 backdrop-blur-sm" title="Settings">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+    </div>
+</main>
+
+<div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div class="glass bg-slate-800 p-8 rounded-2xl w-full max-w-sm transform scale-95 transition-transform duration-300" id="modal-content">
+        <h2 class="text-xl font-semibold mb-6 border-b border-white/10 pb-2">Settings</h2>
+
+        <div class="space-y-4">
+            <div class="flex justify-between items-center">
+                <label class="text-sm text-white/70">Focus Duration (mins)</label>
+                <input type="number" id="input-focus" min="1" max="60" class="bg-white/10 border border-white/20 rounded px-3 py-2 w-20 text-center focus:outline-none focus:border-blue-400 focus:bg-white/20 transition-colors" value="25">
+            </div>
+            <div class="flex justify-between items-center">
+                <label class="text-sm text-white/70">Short Break (mins)</label>
+                <input type="number" id="input-short" min="1" max="30" class="bg-white/10 border border-white/20 rounded px-3 py-2 w-20 text-center focus:outline-none focus:border-green-400 focus:bg-white/20 transition-colors" value="5">
+            </div>
+            <div class="flex justify-between items-center">
+                <label class="text-sm text-white/70">Long Break (mins)</label>
+                <input type="number" id="input-long" min="1" max="60" class="bg-white/10 border border-white/20 rounded px-3 py-2 w-20 text-center focus:outline-none focus:border-rose-400 focus:bg-white/20 transition-colors" value="15">
+            </div>
+        </div>
+
+        <div class="mt-8 flex justify-end gap-3">
+            <button onclick="timerApp.closeSettings()" class="px-4 py-2 text-white/60 hover:text-white text-sm">Cancel</button>
+            <button onclick="timerApp.saveSettings()" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-semibold btn-press shadow-lg transition-colors">Save</button>
+        </div>
+    </div>
+</div>
+
+<audio id="audio-alarm" src="https://assets.mixkit.co/active_storage/sfx/995/995-preview.mp3"></audio>
+
+<script>
+    // FIXED: Renamed variable to 'timerApp' (lowercase) to match HTML onclick handlers
+    const timerApp = (() => {
+        const state = {
+            timeLeft: 25 * 60,
+            totalTime: 25 * 60,
+            timerId: null,
+            isRunning: false,
+            currentMode: 'focus',
+            settings: { focus: 25, shortBreak: 5, longBreak: 15 }
+        };
+
+        const colors = {
+            focus: { stroke: '#93c5fd', bg: 'from-slate-800 to-black' },
+            shortBreak: { stroke: '#6ee7b7', bg: 'from-teal-900 to-slate-900' },
+            longBreak: { stroke: '#fda4af', bg: 'from-indigo-900 to-slate-900' }
+        };
+
+        const els = {
+            timeDisplay: document.getElementById('time-display'),
+            statusText: document.getElementById('status-text'),
+            progressRing: document.getElementById('progress-ring'),
+            actionIcon: document.getElementById('action-icon'),
+            bgGradient: document.getElementById('bg-gradient'),
+            modal: document.getElementById('settings-modal'),
+            modalContent: document.getElementById('modal-content'),
+            inputs: {
+                focus: document.getElementById('input-focus'),
+                short: document.getElementById('input-short'),
+                long: document.getElementById('input-long')
+            }
+        };
+
+        const radius = els.progressRing.r.baseVal.value;
+        const circumference = radius * 2 * Math.PI;
+        els.progressRing.style.strokeDasharray = `${circumference} ${circumference}`;
+
+        function init() {
+            updateTimerDisplay();
+            applyTheme('focus');
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(state.timeLeft / 60);
+            const seconds = state.timeLeft % 60;
+            els.timeDisplay.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            document.title = els.timeDisplay.textContent + " - Focus Timer";
+
+            const percent = (state.timeLeft / state.totalTime) * 100;
+            const offset = circumference - (percent / 100) * circumference;
+            els.progressRing.style.strokeDashoffset = offset;
+        }
+
+        function applyTheme(mode) {
+            els.bgGradient.className = `absolute inset-0 bg-gradient-to-br ${colors[mode].bg} opacity-80 transition-all duration-1000`;
+            els.progressRing.style.stroke = colors[mode].stroke;
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.className = 'mode-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 text-white/60 hover:text-white';
+            });
+            const activeBtn = document.getElementById(mode === 'focus' ? 'btn-focus' : mode === 'shortBreak' ? 'btn-short' : 'btn-long');
+            activeBtn.className = 'mode-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 bg-white/20 shadow-md text-white';
+        }
+
+        function switchMode(mode) {
+            if (state.isRunning) toggleTimer();
+            state.currentMode = mode;
+            state.totalTime = state.settings[mode] * 60;
+            state.timeLeft = state.totalTime;
+            applyTheme(mode);
+            updateTimerDisplay();
+            els.statusText.textContent = "Ready";
+        }
+
+        function toggleTimer() {
+            if (state.isRunning) {
+                clearInterval(state.timerId);
+                state.isRunning = false;
+                els.actionIcon.className = "fas fa-play ml-1";
+                els.statusText.textContent = "Paused";
+                els.progressRing.closest('div').classList.remove('animate-breathe');
+            } else {
+                state.isRunning = true;
+                els.actionIcon.className = "fas fa-pause";
+                els.statusText.textContent = state.currentMode === 'focus' ? "Focusing..." : "Relaxing...";
+                els.progressRing.closest('div').classList.add('animate-breathe');
+
+                state.timerId = setInterval(() => {
+                    if (state.timeLeft > 0) {
+                        state.timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        completeTimer();
+                    }
+                }, 1000);
+            }
+        }
+
+        function completeTimer() {
+            clearInterval(state.timerId);
+            state.isRunning = false;
+            els.actionIcon.className = "fas fa-play ml-1";
+            els.statusText.textContent = "Completed";
+            document.getElementById('audio-alarm').play();
+            els.progressRing.closest('div').classList.remove('animate-breathe');
+        }
+
+        function resetTimer() {
+            if (state.isRunning) toggleTimer();
+            state.timeLeft = state.totalTime;
+            updateTimerDisplay();
+            els.statusText.textContent = "Ready";
+        }
+
+        // --- Settings Logic ---
+        function openSettings() {
+            els.modal.classList.remove('hidden');
+            setTimeout(() => {
+                els.modal.classList.remove('opacity-0');
+                els.modalContent.classList.remove('scale-95');
+                els.modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeSettings() {
+            els.modal.classList.add('opacity-0');
+            els.modalContent.classList.remove('scale-100');
+            els.modalContent.classList.add('scale-95');
+            setTimeout(() => { els.modal.classList.add('hidden'); }, 300);
+        }
+
+        function saveSettings() {
+            // Get values from inputs
+            const newFocus = parseInt(els.inputs.focus.value) || 25;
+            const newShort = parseInt(els.inputs.short.value) || 5;
+            const newLong = parseInt(els.inputs.long.value) || 15;
+
+            // Update State
+            state.settings.focus = newFocus;
+            state.settings.shortBreak = newShort;
+            state.settings.longBreak = newLong;
+
+            // If timer is not running, update current display immediately
+            if (!state.isRunning) {
+                state.totalTime = state.settings[state.currentMode] * 60;
+                state.timeLeft = state.totalTime;
+                updateTimerDisplay();
+            }
+
+            closeSettings();
+        }
+
+        return { init, switchMode, toggleTimer, resetTimer, openSettings, closeSettings, saveSettings };
+    })();
+
+    document.addEventListener('DOMContentLoaded', timerApp.init);
+</script>
+</body>
+</html>
