@@ -1,0 +1,11 @@
+Working on PC 1 (Making Changes)
+ When you are done writing code on your first computer, send it to GitHub:Press Ctrl + K (or Cmd + K on Mac) to open the Commit screen.
+ Check the boxes next to your changed files and type a short message.
+ Hover over the Commit button, click the small arrow next to it, and choose Commit and Push.
+ Click Push on the next screen. Your code is now safely on GitHub.
+
+Switching to PC 2 (Getting Changes)
+ Before you type even a single line of new code on your second computer,
+ pull the latest updates down:Open IntelliJ on your second computer.
+ Press Ctrl + T (or Cmd + T on Mac) to update the project.Click OK on the small window that pops up.
+ Your second computer will instantly update with the files you edited on PC 1.
