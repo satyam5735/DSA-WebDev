@@ -1,6 +1,6 @@
 package Revision_Daywise;
 
-public class DayTwo {
+public class Day2 {
 
 
     // DAY - 2

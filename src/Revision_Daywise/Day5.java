@@ -1,6 +1,6 @@
 package Revision_Daywise;
 
-public class DayFive {
+public class Day5 {
 
     // RECURSION Part 1
 
@@ -110,9 +110,18 @@ public class DayFive {
 
     // Recursion Part 2
 
-    //
+    // Tiling Problem
+    public static int Tiling(int n){
+        if (n == 0 || n == 1) {
+            return 1;
+        }
+        int VerticalTiles = Tiling(n - 1);
+        int HorizontalTiles = Tiling(n - 2);
+        return VerticalTiles + HorizontalTiles;
+    }
     public static void main(String[] args) {
-
+        int n = Tiling(10);
+        System.out.println(n);
     }
 
 }

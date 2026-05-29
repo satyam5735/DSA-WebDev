@@ -2,7 +2,7 @@ package Revision_Daywise;
 
 import java.util.Arrays;
 
-public class DayThree {
+public class Day3 {
 
     //  DAY-3
 

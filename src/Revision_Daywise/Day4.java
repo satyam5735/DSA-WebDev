@@ -1,9 +1,6 @@
 package Revision_Daywise;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-public class DayFour {
+public class Day4 {
 
     // DAY - 4
 

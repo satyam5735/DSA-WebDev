@@ -2,7 +2,7 @@ package Revision_Daywise;
 
 import java.util.Scanner;
 
-public class DayOne {
+public class Day1 {
 
               //  DAY-1
 
