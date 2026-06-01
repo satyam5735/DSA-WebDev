@@ -1,11 +1,5 @@
 package Revision_Daywise;
 
-import SigmaBatch.ClassProblems.RecursionPart2.BinaryString;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 public class Day6 {
 
     // Recursion 2
