@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/title.iml" filepath="$PROJECT_DIR$/title.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DSA_WebDev.iml" filepath="$PROJECT_DIR$/DSA_WebDev.iml" />
     </modules>
   </component>
 </project>
