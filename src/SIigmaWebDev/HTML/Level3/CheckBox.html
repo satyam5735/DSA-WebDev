@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CheckBox Selector</title>
+
+    <style>
+        /* Hide the forms by default */
+        #youtube-form, #google-form {
+            display: none;
+            margin-top: 15px;
+        }
+
+        /* If the YouTube checkbox is checked, show the YouTube form */
+        #select-youtube:checked ~ #youtube-form {
+            display: block;
+        }
+
+        /* If the Google checkbox is checked, show the Google form */
+        #select-google:checked ~ #google-form {
+            display: block;
+        }
+    </style>
+
+</head>
+<body>
+<h1 style="text-align: center">Search Box</h1>
+<!--input type="checkbox" id="select-youtube"> <label for="select-youtube">Show YouTube</label>
+<input type="checkbox" id="select-google"> <label for="select-google">Show Google</label>-->
+<input type="radio" id="select-youtube" name="search-engine" value="youtube"> <label for="select-youtube">Show YouTube</label> <!-- To make radio buttons mutually exclusive (meaning only one can be selected at a time), you must give them the exact same name attribute. -->
+<input type="radio" id="select-google" name="search-engine" value="google"> <label for="select-google">Show Google</label>
+<!-- When you click "Submit" inside the YouTube form, the browser only packages up the inputs that live inside that specific <form> tag. Because your radio buttons are sitting outside on their own, the browser completely ignores their value attributes during submission. They never make it to the URL. -->
+<hr />
+
+<form id="youtube-form" action="https://www.youtube.com/results" method="get">
+    <div>
+        <label for="youtube">Youtube</label>
+        <input type="text" name="search_query" id="youtube" placeholder="Search Youtube">
+    </div>
+    <input type="submit" value="Submit">
+</form>
+
+<form id="google-form" action="https://www.google.com/search" method="get">
+    <div>
+        <label for="google">Google</label>
+        <input type="text" name="q" id="google" placeholder="Search Google">
+    </div>
+    <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>

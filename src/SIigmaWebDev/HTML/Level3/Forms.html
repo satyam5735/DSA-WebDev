@@ -10,11 +10,27 @@
 <body>
 
 <form action="/action">
-    Username: <input type="text" name="username"><br>
-    Password: <input type="password" name="password"><br>
-    Time: <input type="time" name="time"><br>
-    Color: <input type="color" name="color"><br>
+    <div>
+    <label for="username">Enter your username:</label>:
+        <input type="text" id="username" placeholder="username" name="username"><br>
+    </div>
+    <div>
+    <label for="password">Enter your Password: </label>:
+        <input type = "password" id="password" placeholder="password" name = "password"><br>
+    </div>
+
+    <div>
+        <label for="age">Enter your Age: </label>:
+        <input type = "number" id="age" placeholder="age"><br>
+    </div>
+    <hr/>
+    <input type="submit" value="Submit"> <!-- also button and reset -->
+<!--    Time: <input type="time" name="time"><br>-->
+<!--    Color: <input type="color" name="color"><br>-->
+
+    <input type="submit" value = "Click Me"/>
 </form>
+
 
 </body>
 </html>

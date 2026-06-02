@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<form action="https://www.youtube.com/results" method="get"> <!-- When you do not specify a method attribute, almost all web browsers automatically fall back to using method="get" as the default behavior. Therefore, functionality-wise, omitting it completely often results in the same behavior.However, if your framework or environment defaults to a POST request instead, the form will send the search data hidden inside the body of the request instead of the URL bar. -->
+    <div>
+        <label for="youtube">Youtube</label>
+        <input type="text" name="search_query" id="youtube" placeholder="Search Youtube">
+    </div>
+    <input type="submit" value="Submit">
+</form>
+
+<hr />
+
+<form action="https://www.google.com/search" method="get">
+    <div>
+        <label for="google">Google</label>
+        <input type="text" name="q" id="google" placeholder="Search Google">
+    </div>
+    <input type="submit" value="Submit">
+</form>
+
+</body>
+</html>
