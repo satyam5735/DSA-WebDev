@@ -1,0 +1,59 @@
+*{
+    font-family: Verdana, Geneva, Tahoma, Verdana, sans-serif;
+}
+
+h3{
+    color: #b92b27;
+}
+h1{
+    color: #b92b27;
+    text-align: center;
+}
+/*Id Selector*/
+#login{
+    background-color: white;
+}
+#signup{
+    background-color: #b92b27;
+}
+/*Class Selector*/
+.upvote{
+    background-color: green;
+}
+
+.About{
+    text-align: center;
+}
+
+/*!*Descendant Selector*! anchor tags inside paragraph*/
+p a{
+    color: purple;
+}
+nav a {
+    color: hotpink;
+}
+/*Sibling Combinator*/
+p+h3{
+    text-decoration: underline;
+}
+
+.upvote+button{
+    background-color: cornflowerblue;
+}
+
+/*Child Combinator*/
+
+div > input{
+    background-color: white;
+}
+
+/*Attribute Selector*/
+input[type="text"]{
+    color: cornflowerblue;
+}
+input[type="password"]{
+    color: green;
+}
+input[type]{
+    background-color: ghostwhite;
+}
