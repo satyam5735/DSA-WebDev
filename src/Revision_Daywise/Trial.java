@@ -21,33 +21,68 @@ package Revision_Daywise;
 //    }
 //}
 
+//import java.util.Stack;
+//
+//class Solution {
+//    public int calPoints(String[] operations) {
+//        Stack<Integer> result = new Stack<>();
+//        // Stack operates on LIFO(Last In First Out)
+//        for(String op : operations){
+//            if(op.equals("+")){
+//                int last = result.pop();
+//                int lastsecond = last + result.peek();
+//                result.push(last);
+//                result.push(lastsecond);
+//            }
+//            else if(op.equals("D")){
+//                result.push(2*result.peek());
+//            }
+//            else if(op.equals("C")){
+//                result.pop();
+//            }
+//            else{
+//                result.push(Integer.parseInt(op));
+//            }
+//        }
+//        int sum = 0;
+//        for(int i : result){
+//            sum+=i;
+//        }
+//        return sum;
+//    }
+//}
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 class Solution {
-    public int calPoints(String[] operations) {
-        Stack<Integer> result = new Stack<>();
-        // Stack operates on LIFO(Last In First Out)
-        for(String op : operations){
-            if(op.equals("+")){
-                int last = result.pop();
-                int lastsecond = last + result.peek();
-                result.push(last);
-                result.push(lastsecond);
-            }
-            else if(op.equals("D")){
-                result.push(2*result.peek());
-            }
-            else if(op.equals("C")){
-                result.pop();
+    public boolean isValid(String s) {
+        Stack<Character> stack = new Stack<Character>();
+        Map<Character,Character> CloseToOpen = new HashMap<Character,Character>();
+
+        // Map CLOSING brackets (keys) to OPENING brackets (values)
+        CloseToOpen.put(')','(');
+        CloseToOpen.put(']','[');
+        CloseToOpen.put('}','{');
+
+        for (char c : s.toCharArray()) {
+
+            // If it is a closing bracket
+            if (CloseToOpen.containsKey(c)) {
+                // Stack must not be empty, and the top must match the opening bracket
+                if (!stack.isEmpty() && stack.peek() == CloseToOpen.get(c)) {
+                    stack.pop(); // Match found, remove it
+                } else {
+                    return false; // Mismatch or stack was empty when a close bracket appeared
+                }
             }
             else{
-                result.push(Integer.parseInt(op));
+                // It is an opening bracket, push it onto the stack
+                stack.push(c);
             }
         }
-        int sum = 0;
-        for(int i : result){
-            sum+=i;
-        }
-        return sum;
+        // If the stack is empty, all brackets were matched perfectly
+        return stack.isEmpty(); // all poped out
     }
 }
