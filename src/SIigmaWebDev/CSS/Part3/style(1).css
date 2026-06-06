@@ -1,0 +1,28 @@
+div{
+    height:100px;
+    width:1000px;
+    background-color:pink;
+    border-width: 3px;
+    border-style: solid;
+    border-color: red;
+
+    border-radius:10px;
+
+    padding-top: 10px;
+
+    margin-bottom: 20px;
+}
+h1{
+    /*border-width: 2px;*/
+    /*border-style: dashed;*/
+    /*border-color: green;*/
+    border: 5px solid green;
+    border-left-style: dashed ;
+}
+
+button{
+    border: 3px solid black;
+    border-radius:3px;
+    padding-left: 25px;
+    padding-right: 25px;
+}

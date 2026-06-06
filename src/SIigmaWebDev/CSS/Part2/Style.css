@@ -1,3 +1,7 @@
+h3{
+    background-color: orange !important;
+}
+
 *{
     font-family: Verdana, Geneva, Tahoma, Verdana, sans-serif;
 }
@@ -56,4 +60,49 @@ input[type="password"]{
 }
 input[type]{
     background-color: ghostwhite;
+}
+
+/*Pseudo Class*/
+button:hover{
+    background-color: black;
+    color: white;
+}
+h3:hover{
+    text-decoration: none;
+}
+button:active{
+    background-color: palevioletred;
+}
+p:active{
+    font-weight: bold ;
+    color: green;
+}
+
+input[type="radio"]:checked + label{
+    color: red;
+    font-weight: bold;
+}
+
+div:nth-of-type(2){
+    background-color: red;
+}
+
+/*Pseudo Element*/
+
+h1::first-letter{
+    color: black;
+}
+p::first-line{
+    color: blue;
+}
+p::selection{
+    background-color: red;
+}
+
+/*Cascading Properties*/
+h3{
+    background-color: cornflowerblue;
+}
+h3{
+    background-color: lawngreen;
 }

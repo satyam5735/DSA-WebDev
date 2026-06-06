@@ -1,0 +1,59 @@
+/*span{*/
+/*    color: red;*/
+/*    border:2px solid black;*/
+/*    background-color:pink;*/
+/*    height: 100px;*/
+/*    width: 200px;*/
+/*    padding:5px;*/
+/*}*/
+
+/*div{*/
+/*   height:200px;*/
+/*    width:200px;*/
+/*    background-color:greenyellow;*/
+/*    border:2px solid black;*/
+/*    margin:5px;*/
+/*    display:inline-block;*/
+/*}*/
+/*#third{*/
+/*    display:none;*/
+/*}*/
+
+/*h1{*/
+/*    border:2px solid black;*/
+/*    width: 33.33%;*/
+/*}*/
+/*#outer{*/
+/*    height: 400px;*/
+/*    width: 500px;*/
+/*    border: 2px solid black;*/
+/*    background-color: pink;*/
+/*    margin: 50px;*/
+/*    font-size: 20px;*/
+/*}*/
+/*#inner{*/
+/*    height: 100px;*/
+/*    width: 100px;*/
+/*    border: 2px solid black;*/
+/*    background-color: cornflowerblue;*/
+/*    margin-left: 10%;*/
+/*    font-size: 2em;*/
+/*    padding: 1em;*/
+/*}*/
+
+/*button{*/
+/*    font-size: 50px;*/
+/*    border-radius: 15px;*/
+/*    border:5px solid green;*/
+/*    padding-left: 1em;*/
+/*    padding-right: 1em;*/
+/*    !*By this padding will be relative to font-size, if set in px then it will be constant that is if text size increase it will reduce*!*/
+/*}*/
+
+section{
+    font-size: 15px;
+}
+div{
+    /*font-size: 2em;*/
+    font-size: 2rem;
+}
