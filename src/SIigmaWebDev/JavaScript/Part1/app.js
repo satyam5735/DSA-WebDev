@@ -45,13 +45,13 @@
 //Favourite Movie
 // const fav = "Avatar";
 // let guess = prompt("What is your guess?");
-// while((guess != fav)) {
-//     if(guess == "quit"){
+// while((guess !== fav)) {
+//     if(guess === "quit"){
 //         console.log("you Quit!");
 //         break;
 //     }
 //     guess = prompt("Wrong Guess Please Try again!");
 // }
-// if (guess == fav) {
+// if (guess === fav) {
 //     console.log("Congratulations You Got It!");
 // }
