@@ -1,0 +1,82 @@
+/*.box{*/
+/*    height: 100px;*/
+/*    width: 300px;*/
+/*    background-color: pink;*/
+
+/*    animation-name: fontAnimation, colorAnimation, widthAnimation;*/
+/*    animation-duration: 2s;*/
+/*    animation-timing-function: ease-in;*/
+/*    animation-delay: 0s;*/
+/*    animation-iteration-count: 3;*/
+/*    animation-direction: alternate;*/
+
+/*    !*animation: widthAnimation 3s ease-in 0s infinite normal;*!*/
+/*}*/
+/*@keyframes fontAnimation {*/
+/*    from{*/
+/*        font-size: 20px;*/
+/*    }*/
+/*    to{*/
+/*        font-size: 50px;*/
+/*    }*/
+/*}*/
+/*@keyframes colorAnimation {*/
+/*    from{*/
+/*        background-color: green;*/
+/*    }*/
+/*    to{*/
+/*        background-color: pink;*/
+/*    }*/
+/*}*/
+/*@keyframes widthAnimation {*/
+/*    from{*/
+/*        width: 10%;*/
+/*    }*/
+/*    to{*/
+/*        width: 100%;*/
+/*        border-radius: 2%;;*/
+/*    }*/
+/*}*/
+
+
+
+/*h1{*/
+/*    background-color: pink;*/
+/*    border:3px solid black;*/
+/*}*/
+/*@media (width: 400px) {*/
+/*    h1{*/
+/*        background-color: red;*/
+/*    }*/
+/*}*/
+/*@media (min-width: 450px) and (max-width: 800px) {*/
+/*    h1{*/
+/*        background-color: orange;*/
+/*    }*/
+/*}*/
+/*@media (orientation: landscape) {*/
+/*    h1{*/
+/*        background-color: orange;*/
+/*        color: brown;*/
+/*    }*/
+/*}*/
+
+
+/* z-index */
+.item{
+    height: 150px;
+    width: 150px;
+    border: 2px solid black;
+    background-color: pink;
+}
+.one{
+    background-color: aqua;
+    position: relative;
+    z-index: 1;
+}
+.two{
+    background-color: orange;
+    position: relative;
+    bottom: 50px;
+    z-index: 2;
+}

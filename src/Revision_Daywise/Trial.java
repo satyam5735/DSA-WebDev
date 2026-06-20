@@ -52,37 +52,62 @@ package Revision_Daywise;
 //    }
 //}
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
+//import java.util.HashMap;
+//import java.util.Map;
+//import java.util.Stack;
+//
+//class Solution {
+//    public boolean isValid(String s) {
+//        Stack<Character> stack = new Stack<Character>();
+//        Map<Character,Character> CloseToOpen = new HashMap<Character,Character>();
+//
+//        // Map CLOSING brackets (keys) to OPENING brackets (values)
+//        CloseToOpen.put(')','(');
+//        CloseToOpen.put(']','[');
+//        CloseToOpen.put('}','{');
+//
+//        for (char c : s.toCharArray()) {
+//
+//            // If it is a closing bracket
+//            if (CloseToOpen.containsKey(c)) {
+//                // Stack must not be empty, and the top must match the opening bracket
+//                if (!stack.isEmpty() && stack.peek() == CloseToOpen.get(c)) {
+//                    stack.pop(); // Match found, remove it
+//                } else {
+//                    return false; // Mismatch or stack was empty when a close bracket appeared
+//                }
+//            }
+//            else{
+//                // It is an opening bracket, push it onto the stack
+//                stack.push(c);
+//            }
+//        }
+//        // If the stack is empty, all brackets were matched perfectly
+//        return stack.isEmpty(); // all poped out
+//    }
+//}
 
-class Solution {
-    public boolean isValid(String s) {
-        Stack<Character> stack = new Stack<Character>();
-        Map<Character,Character> CloseToOpen = new HashMap<Character,Character>();
 
-        // Map CLOSING brackets (keys) to OPENING brackets (values)
-        CloseToOpen.put(')','(');
-        CloseToOpen.put(']','[');
-        CloseToOpen.put('}','{');
+public class Trial {
+    public static void main(String[] args) {
+        // 1. Capture the start time
+        long startTime = System.nanoTime();
 
-        for (char c : s.toCharArray()) {
-
-            // If it is a closing bracket
-            if (CloseToOpen.containsKey(c)) {
-                // Stack must not be empty, and the top must match the opening bracket
-                if (!stack.isEmpty() && stack.peek() == CloseToOpen.get(c)) {
-                    stack.pop(); // Match found, remove it
-                } else {
-                    return false; // Mismatch or stack was empty when a close bracket appeared
-                }
-            }
-            else{
-                // It is an opening bracket, push it onto the stack
-                stack.push(c);
-            }
+        // 2. The loop (Notice we DO NOT print inside the loop)
+        long count = 0;
+        for (int i = 1; i <= 1_000_000_000; i++) {
+            count++;
         }
-        // If the stack is empty, all brackets were matched perfectly
-        return stack.isEmpty(); // all poped out
+
+        // 3. Capture the end time
+        long endTime = System.nanoTime();
+
+        // 4. Calculate the duration
+        long durationInNanoseconds = endTime - startTime;
+        // Convert to seconds for readability
+        double durationInSeconds = (double) durationInNanoseconds / 1_000_000_000;
+
+        System.out.println("Finished counting to 1 billion!");
+        System.out.println("Time taken: " + durationInSeconds + " seconds");
     }
 }
